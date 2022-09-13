@@ -10,34 +10,6 @@ int32_t tension = 0;    // tension of the power line
 
 static const char *TAG = "WEBSOCKET";
 
-static TimerHandle_t shutdown_signal_timer;
-static SemaphoreHandle_t shutdown_sema;
-
-static void shutdown_signaler(TimerHandle_t xTimer)
-{
-    ESP_LOGI(TAG, "No data received for %d seconds, signaling shutdown", NO_DATA_TIMEOUT_SEC);
-    xSemaphoreGive(shutdown_sema);
-}
-
-#if CONFIG_WEBSOCKET_URI_FROM_STDIN
-static void get_string(char *line, size_t size)
-{
-    int count = 0;
-    while (count < size) {
-        int c = fgetc(stdin);
-        if (c == '\n') {
-            line[count] = '\0';
-            break;
-        } else if (c > 0 && c < 127) {
-            line[count] = c;
-            ++count;
-        }
-        vTaskDelay(10 / portTICK_PERIOD_MS);
-    }
-}
-
-#endif /* CONFIG_WEBSOCKET_URI_FROM_STDIN */
-
 static void websocket_event_handler(void *handler_args, esp_event_base_t base, int32_t event_id, void *event_data)
 {
     esp_websocket_event_data_t *data = (esp_websocket_event_data_t *)event_data;
@@ -74,19 +46,8 @@ static void websocket_app_start(void)
                                          pdFALSE, NULL, shutdown_signaler);
     shutdown_sema = xSemaphoreCreateBinary();
 
-#if CONFIG_WEBSOCKET_URI_FROM_STDIN
-    char line[128];
-
-    ESP_LOGI(TAG, "Please enter uri of websocket endpoint");
-    get_string(line, sizeof(line));
-
-    websocket_cfg.uri = line;
-    ESP_LOGI(TAG, "Endpoint uri: %s\n", line);
-
-#else
-    websocket_cfg.uri = CONFIG_WEBSOCKET_URI;
-
-#endif /* CONFIG_WEBSOCKET_URI_FROM_STDIN */
+    // websocket_cfg.uri = CONFIG_WEBSOCKET_URI;
+    websocket_cfg.uri = "ws://echo.websocket.events";
 
     ESP_LOGI(TAG, "Connecting to %s...", websocket_cfg.uri);
 
