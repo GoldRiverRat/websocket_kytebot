@@ -30,7 +30,6 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         }
         ESP_LOGW(TAG, "Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
 
-        xTimerReset(shutdown_signal_timer, portMAX_DELAY);
         break;
     case WEBSOCKET_EVENT_ERROR:
         ESP_LOGI(TAG, "WEBSOCKET_EVENT_ERROR");
@@ -42,10 +41,6 @@ static void websocket_app_start(void)
 {
     esp_websocket_client_config_t websocket_cfg = {};
 
-    shutdown_signal_timer = xTimerCreate("Websocket shutdown timer", NO_DATA_TIMEOUT_SEC * 1000 / portTICK_PERIOD_MS,
-                                         pdFALSE, NULL, shutdown_signaler);
-    shutdown_sema = xSemaphoreCreateBinary();
-
     // websocket_cfg.uri = CONFIG_WEBSOCKET_URI;
     websocket_cfg.uri = "ws://echo.websocket.events";
 
@@ -55,7 +50,6 @@ static void websocket_app_start(void)
     esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)client);
 
     esp_websocket_client_start(client);
-    xTimerStart(shutdown_signal_timer, portMAX_DELAY);
     char data[32];
     int i = 0;
     while (i < 5) {
@@ -67,10 +61,7 @@ static void websocket_app_start(void)
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
 
-    xSemaphoreTake(shutdown_sema, portMAX_DELAY);
-    esp_websocket_client_close(client, portMAX_DELAY);
-    ESP_LOGI(TAG, "Websocket Stopped");
-    esp_websocket_client_destroy(client);
+
 }
 
 void app_main(void)
