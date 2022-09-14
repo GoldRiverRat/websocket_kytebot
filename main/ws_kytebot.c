@@ -1,5 +1,8 @@
 #include "kytebot.h"
 
+int comm_in [2];
+char str[100];
+
 int winch_num = 0;      // right winch is 1, left winch is 0
 int set_to_zero = 1;    // set the steering line to zero
 int32_t move_to = 0;    // move to the current position
@@ -28,7 +31,19 @@ static void websocket_event_handler(void *handler_args, esp_event_base_t base, i
         } else {
             ESP_LOGW(TAG, "Received=%.*s", data->data_len, (char *)data->data_ptr);
         }
-        ESP_LOGW(TAG, "Total payload length=%d, data_len=%d, current payload offset=%d\r\n", data->payload_len, data->data_len, data->payload_offset);
+
+        sprintf (str, "%.*s\r\n", data->data_len, data->data_ptr);
+        char* token = strtok(str, ","); 
+        int i = 0;
+        while (token != NULL) { 
+            comm_in[i] = atoi(token);
+            i++;
+            token = strtok(NULL, ","); 
+        } 
+        move_to     = comm_in[0];
+        set_to_zero = comm_in[1];
+
+        ESP_LOGW(TAG, "move to=%d, zero=%d\r\n", move_to, set_to_zero);
 
         break;
     case WEBSOCKET_EVENT_ERROR:
