@@ -59,8 +59,6 @@ static void websocket_app_start(void)
         }
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
-
-
 }
 
 void app_main(void)
