@@ -52,12 +52,10 @@ static void websocket_app_start(void)
     char data[32];
     while (1)
     {
-        // if (esp_websocket_client_is_connected(client)) {
-            int len = sprintf(data, "%04d, %04d", curr_pos, tension);
-            ESP_LOGI(TAG, "Sending %s", data);
-            esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
-        // }
-        vTaskDelay(1000 / portTICK_RATE_MS);
+        int len = sprintf(data, "%04d, %04d", curr_pos, tension);
+        ESP_LOGI(TAG, "Sending %s", data);
+        esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
+        vTaskDelay(2000 / portTICK_RATE_MS);
     }
 }
 
@@ -76,9 +74,10 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_event_loop_create_default());
     ESP_ERROR_CHECK(example_connect());
 
-    websocket_app_start();
 
     xTaskCreatePinnedToCore(&get_encoder, "encoder", 2048, NULL, 5, NULL, 1);
     xTaskCreatePinnedToCore(&drive_motor, "motor", 2048, NULL, 4, NULL, 0);
     xTaskCreatePinnedToCore(&get_tension, "tension", 2048, NULL, 3, NULL, 0);
+
+    websocket_app_start();
 }

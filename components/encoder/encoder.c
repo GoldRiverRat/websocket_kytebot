@@ -2,8 +2,6 @@
 
 extern int curr_pos;
 extern int set_to_zero;
-// int curr_pos;
-// int set_to_zero;
 
 void funcEncoder(void)
 {
@@ -21,7 +19,7 @@ void funcEncoder(void)
             pcnt_counter_resume(0);
          };
         curr_pos = encoder->get_counter_value(encoder);
-        printf("set to zero = %i encoder value = %i  \n", set_to_zero, curr_pos );
+        // printf("set to zero = %i encoder value = %i  \n", set_to_zero, curr_pos );
         vTaskDelay(pdMS_TO_TICKS(100));
     }
 }

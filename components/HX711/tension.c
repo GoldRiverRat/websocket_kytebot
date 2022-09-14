@@ -35,7 +35,7 @@ void funcTension(void)
 
         r = hx711_read_data(&dev1, &tension);
 
-        printf("the power line reading = %d   ", tension);        
+        // printf("the power line reading = %d   ", tension);        
 
         if (r != ESP_OK)
         {
