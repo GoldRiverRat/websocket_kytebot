@@ -41,7 +41,6 @@ static void websocket_app_start(void)
 {
     esp_websocket_client_config_t websocket_cfg = {};
 
-    // websocket_cfg.uri = CONFIG_WEBSOCKET_URI;
     websocket_cfg.uri = "ws://echo.websocket.events";
 
     ESP_LOGI(TAG, "Connecting to %s...", websocket_cfg.uri);
