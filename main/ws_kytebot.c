@@ -47,16 +47,16 @@ static void websocket_app_start(void)
 
     esp_websocket_client_handle_t client = esp_websocket_client_init(&websocket_cfg);
     esp_websocket_register_events(client, WEBSOCKET_EVENT_ANY, websocket_event_handler, (void *)client);
-
     esp_websocket_client_start(client);
+
     char data[32];
-    int i = 0;
-    while (i < 5) {
-        if (esp_websocket_client_is_connected(client)) {
-            int len = sprintf(data, "hello %04d", i++);
+    while (1)
+    {
+        // if (esp_websocket_client_is_connected(client)) {
+            int len = sprintf(data, "%04d, %04d", curr_pos, tension);
             ESP_LOGI(TAG, "Sending %s", data);
             esp_websocket_client_send_text(client, data, len, portMAX_DELAY);
-        }
+        // }
         vTaskDelay(1000 / portTICK_RATE_MS);
     }
 }
